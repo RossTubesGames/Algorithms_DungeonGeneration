@@ -9,7 +9,10 @@ public class DebugLineDrawer : MonoBehaviour
     //end point of the line in world space
     [SerializeField]
     private Vector3 end = new Vector3(5f, 0f, 0f); //moving forward
-
+    private void Start()
+    {
+        OnDrawGizmos();
+    }
     //function to draw debug visual
     private void OnDrawGizmos()
     {
