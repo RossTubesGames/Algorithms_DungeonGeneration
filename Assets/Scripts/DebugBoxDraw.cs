@@ -4,70 +4,78 @@ public class DebugBoxDraw : MonoBehaviour
 {
     [Header("Box Settings")]
 
-    // The center position of the box
+    // Center position of the box
     [SerializeField]
     private Vector3 center = Vector3.zero;
 
-    // Width of the box (X direction)
+    // Width of the box (X axis)
     [SerializeField]
     private float width = 5f;
 
-    // length of the box (Z direction)
+    // Length of the box (Z axis)
     [SerializeField]
     private float length = 5f;
 
-    // height of the box (Y direction)
+    // Height offset
     [SerializeField]
     private float height = 0f;
 
-    // Called by Unity every frame for debug drawing
+    // Actual box height
+    [SerializeField]
+    private float boxHeight = 5f;
+
+    // This controls whether the box should be drawn
+    private bool drawBox = false;
+
     private void OnDrawGizmos()
     {
-        // Only draw when the game is running
-        if (!Application.isPlaying)
+        // Only draw when playing AND when drawBox is true
+        if (!Application.isPlaying || !drawBox)
             return;
 
         Gizmos.color = Color.green;
 
-        // Half sizes help calculate the corners relative to the center
         float halfWidth = width / 2f;
-        float halfHeight = length / 2f;
+        float halfLength = length / 2f;
 
-        // Calculate the four corners of the box
-        Vector3 cornerA = center + new Vector3(-halfWidth, height, -halfHeight);
-        Vector3 cornerB = center + new Vector3(halfWidth, height, -halfHeight);
-        Vector3 cornerC = center + new Vector3(halfWidth, height, halfHeight);
-        Vector3 cornerD = center + new Vector3(-halfWidth, height, halfHeight);
-        Vector3 cornerE = center + new Vector3(-halfWidth, height + 5f, -halfHeight);
-        Vector3 cornerF = center + new Vector3(halfWidth, height + 5f, -halfHeight);
-        Vector3 cornerG = center + new Vector3(halfWidth, height + 5f, halfHeight);
-        Vector3 cornerH = center + new Vector3(-halfWidth, height + 5f, halfHeight);
+        Vector3 cornerA = center + new Vector3(-halfWidth, height, -halfLength);
+        Vector3 cornerB = center + new Vector3(halfWidth, height, -halfLength);
+        Vector3 cornerC = center + new Vector3(halfWidth, height, halfLength);
+        Vector3 cornerD = center + new Vector3(-halfWidth, height, halfLength);
 
-        // Draw the four lines that make the box
+        Vector3 cornerE = center + new Vector3(-halfWidth, height + boxHeight, -halfLength);
+        Vector3 cornerF = center + new Vector3(halfWidth, height + boxHeight, -halfLength);
+        Vector3 cornerG = center + new Vector3(halfWidth, height + boxHeight, halfLength);
+        Vector3 cornerH = center + new Vector3(-halfWidth, height + boxHeight, halfLength);
+
+        // Bottom square
         Gizmos.DrawLine(cornerA, cornerB);
         Gizmos.DrawLine(cornerB, cornerC);
         Gizmos.DrawLine(cornerC, cornerD);
         Gizmos.DrawLine(cornerD, cornerA);
 
+        // Top square
         Gizmos.DrawLine(cornerE, cornerF);
         Gizmos.DrawLine(cornerF, cornerG);
         Gizmos.DrawLine(cornerG, cornerH);
         Gizmos.DrawLine(cornerH, cornerE);
 
+        // Vertical lines
         Gizmos.DrawLine(cornerA, cornerE);
         Gizmos.DrawLine(cornerB, cornerF);
         Gizmos.DrawLine(cornerC, cornerG);
         Gizmos.DrawLine(cornerD, cornerH);
+    }
 
-        // Draw spheres so we can see the corners clearly
-        Gizmos.DrawSphere(cornerA, 0.1f);
-        Gizmos.DrawSphere(cornerB, 0.1f);
-        Gizmos.DrawSphere(cornerC, 0.1f);
-        Gizmos.DrawSphere(cornerD, 0.1f);
+    // Draw Box button
+    public void DrawBox()
+    {
+        drawBox = true;
+    }
 
-        Gizmos.DrawSphere(cornerE, 0.1f);
-        Gizmos.DrawSphere(cornerF, 0.1f);
-        Gizmos.DrawSphere(cornerG, 0.1f);
-        Gizmos.DrawSphere(cornerH, 0.1f);
+    // Clear Box button
+    public void ClearBox()
+    {
+        drawBox = false;
     }
 }
