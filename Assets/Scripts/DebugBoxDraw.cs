@@ -19,6 +19,7 @@ public class DebugBoxDraw : MonoBehaviour
 
     private bool drawNodes = false;
     private bool drawBox = false;
+    private bool drawConnectedNodes = false;
 
     private void Awake()
     {
@@ -42,6 +43,11 @@ public class DebugBoxDraw : MonoBehaviour
         if (drawNodes)
         {
             DrawNodeGridGizmo();
+        }
+
+        if (drawConnectedNodes)
+        {
+            DrawConnectedNodeGridGizmo();
         }
     }
 
@@ -96,11 +102,56 @@ public class DebugBoxDraw : MonoBehaviour
             }
         }
     }
+    private void DrawConnectedNodeGridGizmo()
+    {
+        Gizmos.color = Color.red;
+
+        float offset = (gridSize - 1) * nodeSpacing * 0.5f;
+
+        for (int x = 0; x < gridSize; x++)
+        {
+            for (int z = 0; z < gridSize; z++)
+            {
+                float xPos = x * nodeSpacing - offset;
+                float zPos = z * nodeSpacing - offset;
+
+                Vector3 nodePosition = center + new Vector3(xPos, height, zPos);
+
+                // Draw the node
+                Gizmos.DrawSphere(nodePosition, nodeRadius);
+
+                // ----- CONNECT TO RIGHT NEIGHBOR -----
+                if (x < gridSize - 1)
+                {
+                    float rightX = (x + 1) * nodeSpacing - offset;
+                    float rightZ = zPos;
+
+                    Vector3 rightNeighbor =
+                        center + new Vector3(rightX, height, rightZ);
+
+                    Gizmos.DrawLine(nodePosition, rightNeighbor);
+                }
+
+                // ----- CONNECT TO TOP NEIGHBOR -----
+                if (z < gridSize - 1)
+                {
+                    float topX = xPos;
+                    float topZ = (z + 1) * nodeSpacing - offset;
+
+                    Vector3 topNeighbor =
+                        center + new Vector3(topX, height, topZ);
+
+                    Gizmos.DrawLine(nodePosition, topNeighbor);
+                }
+            }
+        }
+    }
 
     public void DrawBox()
     {
         drawBox = true;
         drawNodes = false;
+        drawConnectedNodes = false;
 
         SetCameraForBoxView();
     }
@@ -108,7 +159,17 @@ public class DebugBoxDraw : MonoBehaviour
     public void DrawNodes()
     {
         drawNodes = true;
+        drawConnectedNodes = false;
         drawBox = false;
+
+        SetCameraForNodeView();
+    }
+
+    public void DrawConnectedNodes()
+    {
+        drawConnectedNodes = true;
+        drawBox = false;
+        drawNodes = false;
 
         SetCameraForNodeView();
     }
@@ -117,6 +178,7 @@ public class DebugBoxDraw : MonoBehaviour
     {
         drawBox = false;
         drawNodes = false;
+        drawConnectedNodes = false;
     }
 
     private void SetCameraForBoxView()
