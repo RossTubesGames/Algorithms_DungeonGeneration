@@ -12,9 +12,13 @@ public class DebugBoxDraw : MonoBehaviour
     [SerializeField]
     private float width = 5f;
 
-    // Height of the box (Z direction)
+    // length of the box (Z direction)
     [SerializeField]
-    private float height = 5f;
+    private float length = 5f;
+
+    // height of the box (Y direction)
+    [SerializeField]
+    private float height = 0f;
 
     // Called by Unity every frame for debug drawing
     private void OnDrawGizmos()
@@ -27,17 +31,17 @@ public class DebugBoxDraw : MonoBehaviour
 
         // Half sizes help calculate the corners relative to the center
         float halfWidth = width / 2f;
-        float halfHeight = height / 2f;
+        float halfHeight = length / 2f;
 
         // Calculate the four corners of the box
-        Vector3 cornerA = center + new Vector3(-halfWidth, 0f, -halfHeight);
-        Vector3 cornerB = center + new Vector3(halfWidth, 0f, -halfHeight);
-        Vector3 cornerC = center + new Vector3(halfWidth, 0f, halfHeight);
-        Vector3 cornerD = center + new Vector3(-halfWidth, 0f, halfHeight);
-        Vector3 cornerE = center + new Vector3(-halfWidth, 5f, -halfHeight);
-        Vector3 cornerF = center + new Vector3(halfWidth, 5f, -halfHeight);
-        Vector3 cornerG = center + new Vector3(halfWidth, 5f, halfHeight);
-        Vector3 cornerH = center + new Vector3(-halfWidth, 5f, halfHeight);
+        Vector3 cornerA = center + new Vector3(-halfWidth, height, -halfHeight);
+        Vector3 cornerB = center + new Vector3(halfWidth, height, -halfHeight);
+        Vector3 cornerC = center + new Vector3(halfWidth, height, halfHeight);
+        Vector3 cornerD = center + new Vector3(-halfWidth, height, halfHeight);
+        Vector3 cornerE = center + new Vector3(-halfWidth, height + 5f, -halfHeight);
+        Vector3 cornerF = center + new Vector3(halfWidth, height + 5f, -halfHeight);
+        Vector3 cornerG = center + new Vector3(halfWidth, height + 5f, halfHeight);
+        Vector3 cornerH = center + new Vector3(-halfWidth, height + 5f, halfHeight);
 
         // Draw the four lines that make the box
         Gizmos.DrawLine(cornerA, cornerB);
@@ -49,6 +53,11 @@ public class DebugBoxDraw : MonoBehaviour
         Gizmos.DrawLine(cornerF, cornerG);
         Gizmos.DrawLine(cornerG, cornerH);
         Gizmos.DrawLine(cornerH, cornerE);
+
+        Gizmos.DrawLine(cornerA, cornerE);
+        Gizmos.DrawLine(cornerB, cornerF);
+        Gizmos.DrawLine(cornerC, cornerG);
+        Gizmos.DrawLine(cornerD, cornerH);
 
         // Draw spheres so we can see the corners clearly
         Gizmos.DrawSphere(cornerA, 0.1f);
