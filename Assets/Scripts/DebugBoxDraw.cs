@@ -34,6 +34,10 @@ public class DebugBoxDraw : MonoBehaviour
         Vector3 cornerB = center + new Vector3(halfWidth, 0f, -halfHeight);
         Vector3 cornerC = center + new Vector3(halfWidth, 0f, halfHeight);
         Vector3 cornerD = center + new Vector3(-halfWidth, 0f, halfHeight);
+        Vector3 cornerE = center + new Vector3(-halfWidth, 5f, -halfHeight);
+        Vector3 cornerF = center + new Vector3(halfWidth, 5f, -halfHeight);
+        Vector3 cornerG = center + new Vector3(halfWidth, 5f, halfHeight);
+        Vector3 cornerH = center + new Vector3(-halfWidth, 5f, halfHeight);
 
         // Draw the four lines that make the box
         Gizmos.DrawLine(cornerA, cornerB);
@@ -41,10 +45,20 @@ public class DebugBoxDraw : MonoBehaviour
         Gizmos.DrawLine(cornerC, cornerD);
         Gizmos.DrawLine(cornerD, cornerA);
 
+        Gizmos.DrawLine(cornerE, cornerF);
+        Gizmos.DrawLine(cornerF, cornerG);
+        Gizmos.DrawLine(cornerG, cornerH);
+        Gizmos.DrawLine(cornerH, cornerE);
+
         // Draw spheres so we can see the corners clearly
         Gizmos.DrawSphere(cornerA, 0.1f);
         Gizmos.DrawSphere(cornerB, 0.1f);
         Gizmos.DrawSphere(cornerC, 0.1f);
         Gizmos.DrawSphere(cornerD, 0.1f);
+
+        Gizmos.DrawSphere(cornerE, 0.1f);
+        Gizmos.DrawSphere(cornerF, 0.1f);
+        Gizmos.DrawSphere(cornerG, 0.1f);
+        Gizmos.DrawSphere(cornerH, 0.1f);
     }
 }
