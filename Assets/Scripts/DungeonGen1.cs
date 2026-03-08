@@ -35,13 +35,17 @@ public class DungeonGen1 : MonoBehaviour
     [SerializeField] private Color nodeColor = Color.yellow;
     [SerializeField] private Color edgeColor = Color.red;
 
+    // Controls whether the dungeon should currently be visible
     private bool dungeonVisible = false;
 
+    // Store the center positions of the rooms
     private Vector3 roomA;
     private Vector3 roomB;
+    private Vector3 roomC;
 
     private void Awake()
     {
+        // If no camera was assigned manually, use the Main Camera
         if (cam == null)
         {
             cam = Camera.main;
@@ -50,30 +54,49 @@ public class DungeonGen1 : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // Only draw when the game is running
+        // Only draw while playing and only if the dungeon is enabled
         if (!Application.isPlaying || !dungeonVisible)
             return;
 
-        // Draw both rooms
+        // Draw all three rooms
         DrawRoom(roomA);
         DrawRoom(roomB);
+        DrawRoom(roomC);
 
-        // Draw the connection between them
+        // Draw connection from room A to room B
         DrawConnection(roomA, roomB);
+
+        // Draw connection from room A to room C
+        DrawConnection(roomA, roomC);
     }
 
     public void GenerateDungeon1()
     {
-        // First room is placed exactly at the center
+        // Room A is always the starting room in the center
         roomA = center;
 
-        // Second room is placed one room size to the right
+        // Room B is always placed to the right of room A
         roomB = center + new Vector3(roomSize, 0f, 0f);
+
+        // Random.Range(0, 2) gives either 0 or 1
+        // This creates a 50/50 chance
+        int randomChoice = Random.Range(0, 2);
+
+        // If randomChoice is 0, place room C above room A
+        if (randomChoice == 0)
+        {
+            roomC = center + new Vector3(0f, 0f, roomSize);
+        }
+        // Otherwise place room C below room A
+        else
+        {
+            roomC = center + new Vector3(0f, 0f, -roomSize);
+        }
 
         // Enable drawing
         dungeonVisible = true;
 
-        // Move camera so the dungeon is clearly visible
+        // Move the camera so the full layout is visible
         SetCameraForDungeonView();
     }
 
@@ -94,26 +117,25 @@ public class DungeonGen1 : MonoBehaviour
         // Set color for the room outline
         Gizmos.color = roomColor;
 
-        // Half size helps calculate corners
+        // Half of the room size is used to calculate corners from the center
         float half = roomSize * 0.5f;
 
-        // Calculate the four corners of the square
+        // Calculate the 4 corners of the room square
         Vector3 a = roomCenter + new Vector3(-half, yLevel, -half);
         Vector3 b = roomCenter + new Vector3(half, yLevel, -half);
         Vector3 c = roomCenter + new Vector3(half, yLevel, half);
         Vector3 d = roomCenter + new Vector3(-half, yLevel, half);
 
-        // Draw the square edges
+        // Draw the square room
         Gizmos.DrawLine(a, b);
         Gizmos.DrawLine(b, c);
         Gizmos.DrawLine(c, d);
         Gizmos.DrawLine(d, a);
 
-        // Draw the center node of the room
+        // Draw a yellow node in the center of the room
         Gizmos.color = nodeColor;
         Gizmos.DrawSphere(roomCenter + new Vector3(0f, yLevel, 0f), roomNodeRadius);
     }
-
 
     /*
     ==========================================
@@ -121,8 +143,8 @@ public class DungeonGen1 : MonoBehaviour
     ==========================================
     Draws a red line between two room centers.
 
-    This represents the dungeon graph edge
-    connecting the two rooms.
+    This represents a graph connection
+    between the two rooms.
     */
     private void DrawConnection(Vector3 from, Vector3 to)
     {
@@ -130,14 +152,13 @@ public class DungeonGen1 : MonoBehaviour
         Gizmos.DrawLine(from + new Vector3(0f, yLevel, 0f),
                         to + new Vector3(0f, yLevel, 0f));
     }
+
     private void SetCameraForDungeonView()
     {
         if (cam == null) return;
 
-        // Position camera above the dungeon
-        cam.transform.position = center + new Vector3(roomSize * 0.5f, 8f, 0f);
-
-        // Rotate camera to look straight down
+        // Slightly higher camera so 3 rooms fit comfortably in view
+        cam.transform.position = center + new Vector3(0f, 10f, 0f);
         cam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
     }
 }
