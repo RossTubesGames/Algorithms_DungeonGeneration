@@ -104,8 +104,6 @@ public class DebugBoxDraw : MonoBehaviour
     }
     private void DrawConnectedNodeGridGizmo()
     {
-        Gizmos.color = Color.red;
-
         float offset = (gridSize - 1) * nodeSpacing * 0.5f;
 
         for (int x = 0; x < gridSize; x++)
@@ -117,10 +115,11 @@ public class DebugBoxDraw : MonoBehaviour
 
                 Vector3 nodePosition = center + new Vector3(xPos, height, zPos);
 
-                // Draw the node
+                // ---- DRAW NODE ----
+                Gizmos.color = Color.yellow;
                 Gizmos.DrawSphere(nodePosition, nodeRadius);
 
-                // ----- CONNECT TO RIGHT NEIGHBOR -----
+                // ---- CONNECT TO RIGHT NEIGHBOR ----
                 if (x < gridSize - 1)
                 {
                     float rightX = (x + 1) * nodeSpacing - offset;
@@ -129,10 +128,11 @@ public class DebugBoxDraw : MonoBehaviour
                     Vector3 rightNeighbor =
                         center + new Vector3(rightX, height, rightZ);
 
+                    Gizmos.color = Color.red;
                     Gizmos.DrawLine(nodePosition, rightNeighbor);
                 }
 
-                // ----- CONNECT TO TOP NEIGHBOR -----
+                // ---- CONNECT TO TOP NEIGHBOR ----
                 if (z < gridSize - 1)
                 {
                     float topX = xPos;
@@ -141,12 +141,13 @@ public class DebugBoxDraw : MonoBehaviour
                     Vector3 topNeighbor =
                         center + new Vector3(topX, height, topZ);
 
+                    Gizmos.color = Color.red;
                     Gizmos.DrawLine(nodePosition, topNeighbor);
                 }
             }
         }
     }
-
+    //buttons
     public void DrawBox()
     {
         drawBox = true;
