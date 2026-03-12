@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DungeonGen1 : MonoBehaviour
@@ -30,6 +31,10 @@ public class DungeonGen1 : MonoBehaviour
     [SerializeField] private float yLevel = 0f;
     [SerializeField] private float roomNodeRadius = 0.15f;
 
+    [Header("Dungeon Settings")]
+    [SerializeField] private int maxRooms = 8;
+    [SerializeField] private int maxPlacementAttempts = 100;
+
     [Header("Colors")]
     [SerializeField] private Color roomColor = Color.green;
     [SerializeField] private Color nodeColor = Color.yellow;
@@ -37,6 +42,12 @@ public class DungeonGen1 : MonoBehaviour
 
     // Controls whether the dungeon should currently be visible
     private bool dungeonVisible = false;
+
+    // All generated room centers are stored here
+    private List<Vector3> rooms = new List<Vector3>();
+
+    // All connections between rooms are stored here
+    private List<RoomConnection> connections = new List<RoomConnection>();
 
     // Store the center positions of the rooms
     private Vector3 roomA;
@@ -58,6 +69,18 @@ public class DungeonGen1 : MonoBehaviour
         if (!Application.isPlaying || !dungeonVisible)
             return;
 
+        // Draw every room
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            DrawRoom(rooms[i]);
+        }
+
+        // Draw every connection
+        for (int i = 0; i < connections.Count; i++)
+        {
+            DrawConnection(connections[i].from, connections[i].to);
+        }
+
         // Draw all three rooms
         DrawRoom(roomA);
         DrawRoom(roomB);
@@ -72,6 +95,43 @@ public class DungeonGen1 : MonoBehaviour
 
     public void GenerateDungeon1()
     {
+
+
+        // Clear old dungeon data first
+        rooms.Clear();
+        connections.Clear();
+
+        // First room always starts at the center
+        rooms.Add(center);
+
+        int attempts = 0;
+
+        // Keep trying until we have enough rooms
+        while (rooms.Count < maxRooms && attempts < maxPlacementAttempts)
+        {
+            attempts++;
+
+            // Pick a random existing room as the base room
+            Vector3 baseRoom = rooms[Random.Range(0, rooms.Count)];
+
+            // Pick a random direction
+            Vector3 direction = GetRandomDirection();
+
+            // Candidate position for a new room
+            Vector3 newRoom = baseRoom + direction * roomSize;
+
+            // Only place the room if it does not already exist
+            if (!RoomExists(newRoom))
+            {
+                rooms.Add(newRoom);
+                connections.Add(new RoomConnection(baseRoom, newRoom));
+            }
+        }
+
+        dungeonVisible = true;
+        SetCameraForDungeonView();
+
+        /*
         // Room A is always the starting room in the center
         roomA = center;
 
@@ -97,12 +157,45 @@ public class DungeonGen1 : MonoBehaviour
         dungeonVisible = true;
 
         // Move the camera so the full layout is visible
-        SetCameraForDungeonView();
+        SetCameraForDungeonView();*/
     }
 
     public void ClearDungeon1()
     {
         dungeonVisible = false;
+        rooms.Clear();
+        connections.Clear();
+    }
+
+    private Vector3 GetRandomDirection()
+    {
+        int randomChoice = Random.Range(0, 4);
+
+        if (randomChoice == 0)
+            return Vector3.right;
+
+        if (randomChoice == 1)
+            return Vector3.left;
+
+        if (randomChoice == 2)
+            return Vector3.forward;
+
+        return Vector3.back;
+    }
+
+    private bool RoomExists(Vector3 candidateRoom)
+    {
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            // Because positions are placed exactly on roomSize steps,
+            // direct comparison is okay here
+            if (rooms[i] == candidateRoom)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /*
@@ -146,11 +239,11 @@ public class DungeonGen1 : MonoBehaviour
     This represents a graph connection
     between the two rooms.
     */
-    private void DrawConnection(Vector3 from, Vector3 to)
+    private void DrawConnection(Vector3 point1, Vector3 point2)
     {
         Gizmos.color = edgeColor;
-        Gizmos.DrawLine(from + new Vector3(0f, yLevel, 0f),
-                        to + new Vector3(0f, yLevel, 0f));
+        Gizmos.DrawLine(point1 + new Vector3(0f, yLevel, 0f),
+                        point2 + new Vector3(0f, yLevel, 0f));
     }
 
     private void SetCameraForDungeonView()
@@ -160,5 +253,17 @@ public class DungeonGen1 : MonoBehaviour
         // Slightly higher camera so 3 rooms fit comfortably in view
         cam.transform.position = center + new Vector3(0f, 10f, 0f);
         cam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+    }
+    // Simple helper type to store one edge in the dungeon graph
+    private struct RoomConnection
+    {
+        public Vector3 from;
+        public Vector3 to;
+
+        public RoomConnection(Vector3 from, Vector3 to)
+        {
+            this.from = from;
+            this.to = to;
+        }
     }
 }
